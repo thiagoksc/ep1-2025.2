@@ -8,6 +8,7 @@ public class Main {
           Scanner sc = new Scanner(System.in).useLocale(Locale.US);
         String nome = sc.next();
         String cpf = sc.next();
+        int  idade = sc.nextInt();
         }
 
 
