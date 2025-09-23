@@ -6,6 +6,8 @@ import java.util.Scanner;
 
 public class HospitalSistema {
     private static List<Paciente> listaDePacientes = new ArrayList<>();
+    private static List<Medico> listaDeMedicos = new ArrayList<>();
+    private static List<Especialidade> ListadeEspecialidades = new ArrayList<>();
 
     private static Scanner scanner = new Scanner(System.in);
 
@@ -26,6 +28,12 @@ public class HospitalSistema {
                 case 2:
                     listarPacientes();
                     break;
+                case 3:
+                    cadastrarNovoMedico();
+                    break;
+                case 4:
+                    listarMedicos();
+                    break;
                 case 9:
                     System.out.println("Encerrando o sistema...");
                 default:
@@ -36,10 +44,19 @@ public class HospitalSistema {
         scanner.close();
     }
 
+    private static void inicializarEspecialidade(){
+        listaDeEspecialidades.add(new Especialidade("Cardiologia"));
+        listadeEspecialidades.add(new Especialidade("Pediatria"));
+        listaDeEspecialidades.add(new Especialidade("Ortopedia"));
+        listaDeEspecialidades.add(new Especialidade("Dermatologia"));
+   }
+
     public static void exibirMenu(){
         System.out.println("\n--- MENU PRINCIPAL ---");
-        System.out.println("1. Cadastrar paciente");
-        System.out.println("2. Listar pacientes");
+        System.out.println("1. Cadastrar Paciente");
+        System.out.println("2. Listar Pacientes");
+        System.out.println("3. Cadastrar Novo Médico");
+        System.out.println("4. Listar Medicos");
         System.out.println("9. Sair");
     }
     public static void cadastrarNovoPaciente(){
@@ -79,6 +96,17 @@ public class HospitalSistema {
             System.out.println("\n--- Paciente " + (i + 1) + "---");
             p.exibirInformacoes();
         }
+    }
+
+    public static void cadastrarNovoMedico(){
+        System.out.println("\n--- Cadastro de Novo Médico ---");
+        System.out.print("Nome do Médico: ");
+        String nome = scanner.nextLine();
+        System.out.print("CRM: ");
+        String crm = scanner.nextLine();
+        System.out.print("Custo da Consulta: R$ ");
+        double custo = scanner.nextDouble();
+        scanner.nextLine();
     }
 
 }
