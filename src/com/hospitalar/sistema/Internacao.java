@@ -13,7 +13,7 @@ public class Internacao {
     private double custoDiaria;
     private StatusInternacao status;
 
-    public Internacao(Paciente paciente, Medico medicoResponsavel, LocalDate dataEntrada, LocalDate dataSaida, String quarto, double custoDiaria, StatusInternacao status) {
+    public Internacao(Paciente paciente, Medico medicoResponsavel, String quarto, double custoDiaria) {
         this.paciente = paciente;
         this.medicoResponsavel = medicoResponsavel;
         this.quarto = quarto;
@@ -23,7 +23,7 @@ public class Internacao {
         this.status = StatusInternacao.ATIVA;
     }
 
-    public Internacao(Paciente paciente, Medico medico, LocalDate dataEntrada, String quarto, double custoDiaria, StatusInternacao status) {
+    public Internacao(Paciente paciente, Medico medico, LocalDate dataEntrada, LocalDate dataSaida, String quarto, double custoDiaria, StatusInternacao status) {
         this.paciente = paciente;
         this.medicoResponsavel = medico;
         this.quarto = quarto;
@@ -45,7 +45,9 @@ public class Internacao {
     }
 
     public void cancelar() {
-        this.status = StatusInternacao.CANCELADA;
+        if (this.status == StatusInternacao.ATIVA)  {
+            this.status = StatusInternacao.CANCELADA;
+        }
     }
 
     public Paciente getPaciente() {
@@ -63,18 +65,16 @@ public class Internacao {
     public LocalDate getDataSaida() {
         return dataSaida;
     }
-
     public String getQuarto() {
         return quarto;
     }
-
     public double getCustoDiaria() {
         return custoDiaria;
     }
-
     public StatusInternacao getStatus() {
         return status;
     }
+
 
     public void exibirInformacoes() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -85,6 +85,8 @@ public class Internacao {
         System.out.println("Data de Entrada: " + dataEntrada.format(formatter));
         if (dataSaida != null) {
             System.out.println("Data de Saída: " + dataSaida.format(formatter));
+        }else {
+            System.out.println("Data de Saída: -");
         }
     }
 
