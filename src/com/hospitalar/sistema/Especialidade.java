@@ -10,7 +10,7 @@ public class Especialidade {
         return nome;
     }
 
-    @Override
+
     public String  toString(String nome) {
         return nome;
     }

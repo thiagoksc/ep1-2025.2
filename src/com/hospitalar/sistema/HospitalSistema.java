@@ -7,14 +7,14 @@ import java.util.Scanner;
 public class HospitalSistema {
     private static List<Paciente> listaDePacientes = new ArrayList<>();
     private static List<Medico> listaDeMedicos = new ArrayList<>();
-    private static List<Especialidade> ListaDeEspecialidades = new ArrayList<>();
+    private static List<Especialidade> listaDeEspecialidades = new ArrayList<>();
 
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         System.out.println("Bem-vindo ao Sistema de Gerenciamento Hospitalar!");
 
-        inicializarEspecialidade();
+        inicializarEspecialidades();
 
         int opcao = 0;
         while (opcao != 9){
@@ -111,8 +111,8 @@ public class HospitalSistema {
         scanner.nextLine();
 
         System.out.println("\nSelecione a Especialidade:");
-        for (int i = 0; i < ListaDeEspecialidades.size(); i++) {
-            System.out.println((i + 1) + ". " + ListaDeEspecialidades.get(i).getNome());
+        for (int i = 0; i < listaDeEspecialidades.size(); i++) {
+            System.out.println((i + 1) + ". " + listaDeEspecialidades.get(i).getNome());
         }
         System.out.println((listaDeEspecialidades.size() + 1) + ". Outra (Cadastrar nova especialidade)");
 
@@ -134,10 +134,10 @@ public class HospitalSistema {
         }
 
         if (especialidadeEscolhida != null) {
-            Medico novoMedico  = new Medico(nome, crm, especialidadeEscolhida, custo);
+            Medico novoMedico = new Medico(nome, crm, especialidadeEscolhida, custo);
 
             System.out.print("Deseja adicionar horários para este médico agora? (S/N): ");
-            if (scanner.nextLine().equalsIgnoreCase("S")){
+            if (scanner.nextLine().equalsIgnoreCase("S")) {
                 System.out.println("Digite os horários disponíveis (ex: 14:00). Digite 'fim' para parar.");
                 String horario = "";
                 while (!horario.equalsIgnoreCase("fim")) {
@@ -145,10 +145,18 @@ public class HospitalSistema {
                     horario = scanner.nextLine();
                     if (!horario.equalsIgnoreCase("fim")) {
                         novoMedico.adicionarHorario(horario);
+                    }
+                }
+
             }
+            listaDeMedicos.add(novoMedico);
+            System.out.println("Medico cadastrado com sucesso!");
+        }else {
+            System.out.println("Opção de Especialidade inválida. O cadastro foi cancelado");
         }
 
     }
+
     private static void listarMedicos(){
         System.out.println("\n--- Lista de Medicos Cadastrados ---");
         if  (listaDeMedicos.isEmpty()){
