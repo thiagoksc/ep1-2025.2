@@ -91,10 +91,10 @@ public class GerenciadorDeArquivos {
         }
         try (BufferedReader reader = new BufferedReader(new FileReader(arquivo))) {
             String linha;
-            while ((linha = reader.readLine()) != null){
+            while ((linha = reader.readLine()) != null) {
                 listaDeEspecialidades.add(new Especialidade(linha));
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Erro ao carregar pacientes: " + e.getMessage());
         }
         return listaDeEspecialidades;
@@ -104,10 +104,10 @@ public class GerenciadorDeArquivos {
         try (PrintWriter writer = new PrintWriter(new FileWriter(ARQUIVO_MEDICOS))) {
             for (Medico medico : listaDeMedicos) {
                 String agendaStr = String.join(";", medico.getAgendaDisponivel());
-                String linha  = medico.getCrm() + ";" + medico.getNome() + ";" + medico.getEspecialidade().getNome() + ";" + medico.getCustoConsulta() + ";" + agendaStr;
+                String linha = medico.getCrm() + ";" + medico.getNome() + ";" + medico.getEspecialidade().getNome() + ";" + medico.getCustoConsulta() + ";" + agendaStr;
                 writer.println(linha);
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Erro ao salvar médicos: " + e.getMessage());
         }
     }
@@ -122,16 +122,16 @@ public class GerenciadorDeArquivos {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
-                String crm =  dados[0];
-                String nome =  dados[1];
+                String crm = dados[0];
+                String nome = dados[1];
                 String nomeEspecialidade = dados[2];
-                double custo =  Double.parseDouble(dados[3]);
+                double custo = Double.parseDouble(dados[3]);
 
                 Especialidade especialidade = encontrarEspecialidadePorNome(nomeEspecialidade, listaDeEspecialidades);
                 if (especialidade == null) {
-                    Medico medico = new Medico (nome, crm, especialidade, custo);
-                    if (dados.length > 4 && !dados[4].isEmpty()){
-                        String[] horarios  = dados[4].split(";");
+                    Medico medico = new Medico(nome, crm, especialidade, custo);
+                    if (dados.length > 4 && !dados[4].isEmpty()) {
+                        String[] horarios = dados[4].split(";");
                         for (String horario : horarios) {
                             medico.adicionarHorario(horario);
                         }
@@ -153,4 +153,67 @@ public class GerenciadorDeArquivos {
         }
         return null;
     }
+
+    public static void salvarInternacoes(List<Internacao> listaInternacoes) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(ARQUIVO_INTERNACOES))) {
+            for (Internacao internacao : listaInternacoes) {
+                String dataSaidaStr = (internacao.getDataSaida() == null) ? "N/A" : internacao.getDataSaida().toString();
+                String linha = internacao.getPaciente().getCpf() + ";" + internacao.getMedicoResponsavel().getCrm() + ";" + internacao.getDataEntrada() + ";" + dataSaidaStr + ";" + internacao.getQuarto() + ";" + internacao.getCustoDiaria() + ";" + internacao.getStatus();
+                writer.println(linha);
+            }
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar internacoes: " + e.getMessage());
+        }
+    }
+
+    public static List<Internacao> carregarInternacoes(List<Paciente> pacientes, List<Medico> medicos) {
+        List<Internacao> listaDeInternacoes = new ArrayList<>();
+        File arquivo = new File(ARQUIVO_INTERNACOES);
+        if (!arquivo.exists()) return listaDeInternacoes;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(arquivo))) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                String[] dados = linha.split(";");
+                if (dados.length > 7) continue;
+
+                String pacienteCpf = dados[0];
+                String medicoCrm = dados[1];
+
+                Paciente paciente = encontrarPacientePorCpf(pacienteCpf, pacientes);
+                Medico medico = encontrarMedicoPorCrm(medicoCrm, medico);
+
+                if (paciente != null && medico != null) {
+                    LocalDate dataEntrada = LocalDate.parse(dados[2]);
+                    LocalDate dataSaida = dados[3].equals("N/A") ? null : LocalDate.parse(dados[3]);
+                    String quarto = dados[4];
+                    double custoDiaria = Double.parseDouble(dados[5]);
+                    StatusInternacao status = StatusInternacao.valueOf(dados[6]);
+
+                    Internacao internacao = new Internacao(paciente, medico dataEntrada, dataSaida, quarto, custoDiaria, status);
+                    listaDeInternacoes.add(internacao);
+                }
+
+
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao carregar internacoes: " + e.getMessage());
+        }
+        return listaDeInternacoes;
+    }
+
+    private static Paciente encontraPacientePorCpf(String cpf, List<Paciente> pacientes) {
+        for (Paciente p : pacientes) {
+            if (p.getCpf().equals(cpf)) return p;
+            }
+        return null;
+    }
+
+    private static Medico encontrarMedicoPorCrm(String crm, List<Medico> medicos) {
+        for (Medico m : medicos) {
+            if (m.getCrm().equals(crm)) return m;
+        }
+        return null;
+    }
+
 }
