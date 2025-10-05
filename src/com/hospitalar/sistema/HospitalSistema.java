@@ -43,6 +43,9 @@ public class HospitalSistema {
                 case 5:
                     agendarNovaConsulta();
                     break;
+                case 6:
+                    concluirConsulta();
+                    break;
                 case 9:
                     System.out.println("Encerrando o sistema...");
                 default:
@@ -65,8 +68,9 @@ public class HospitalSistema {
         System.out.println("1. Cadastrar Paciente");
         System.out.println("2. Listar Pacientes");
         System.out.println("3. Cadastrar Novo Médico");
+        System.out.println("4. Listar Médicos");
         System.out.println("5. Agendar Nova Consulta");
-        System.out.println("4. Listar Medicos");
+        System.out.println("6. Concluirt Consultar e Registrar Diagnóstico");
         System.out.println("9. Sair");
     }
 
@@ -256,6 +260,50 @@ public class HospitalSistema {
             Medico m =  listaDeMedicos.get(i);
             System.out.println("\n--- Medico " + (i + 1) + "---");
             m.exibirInformacoes();
+        }
+    }
+
+    private static void concluirConsulta() {
+        System.out.println("\n--- Concluir Consulta e Registrar Diagnóstico ---");
+
+        List<Consulta> consultasAgendadas = new ArrayList<>();
+        for (Consulta c : listaDeConsultas) {
+            if (c.getStatus() == StatusConsulta.AGENDADA) {
+                consultasAgendadas.add(c);
+            }
+        }
+        if (consultasAgendadas.isEmpty()) {
+            System.out.println("Não há consultas agendadas para concluir.");
+            return;
+        }
+
+        System.out.println("Selecione a consulta que deseja concluir: ");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy  HH:mm");
+        for (int i = 0; i < consultasAgendadas.size(); i++) {
+            Consulta c = consultasAgendadas.get(i);
+            System.out.println((i + i) + ". Pacinte: " + c.getPaciente().getNome() + " | Médico: " + c.getMedico().getNome() + " | Data: " + c.getDataHora().format(formatter));
+
+        }
+
+        System.out.println("Opção: ");
+        int indiceConsulta = scanner.nextInt();
+        scanner.nextLine();
+
+        try {
+            Consulta consultaEscolhida = consultasAgendadas.get(indiceConsulta);
+
+            System.out.print("Digite o diagnóstico: ");
+            String diagnostico = scanner.nextLine();
+
+            System.out.print("Digite a prescrição de medicamentos: ");
+            String prescricao = scanner.nextLine();
+
+            consultaEscolhida.registrarDiagnostico(diagnostico, prescricao);
+
+            System.out.println("\nConsulta concluída e diagnóstico registrado com sucesso!");
+
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Opção inválida. Operação cancelada.");
         }
     }
 

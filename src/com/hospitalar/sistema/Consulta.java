@@ -10,6 +10,8 @@ public class Consulta {
    private String local;
    private StatusConsulta status;
    private double custoFinal;
+   private String diagnostico;
+   private String prescricao;
 
    private static final double DESCONTO_PLANO_SAUDE = 0.20;
 
@@ -19,6 +21,8 @@ public class Consulta {
        this.dataHora = dataHora;
        this.local = local;
        this.status = StatusConsulta.AGENDADA;
+       this.diagnostico = "";
+       this.prescricao = "";
 
        this.calcularCustoFinal();
 
@@ -33,6 +37,13 @@ public class Consulta {
            this.custoFinal = custoBase;
        }
     }
+
+    public void registrarDiagnostico(String diagnostico, String prescricao) {
+       this.diagnostico = diagnostico;
+       this.prescricao = prescricao;
+       this.status = StatusConsulta.CONCLUIDA;
+    }
+
 
     public Paciente getPaciente() {
        return paciente;
@@ -65,5 +76,10 @@ public class Consulta {
        System.out.println("Local: " + local);
        System.out.println("Status: " + status);
        System.out.println("Custo Final: R$ " + String.format("%.2f", custoFinal));
+       if(status == StatusConsulta.CONCLUIDA){
+           System.out.println("Diagnostico: " + this.diagnostico);
+           System.out.println("Prescricao: " + this.prescricao);
+       }
     }
+
 }
