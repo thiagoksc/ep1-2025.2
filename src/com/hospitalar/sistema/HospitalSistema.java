@@ -1,13 +1,17 @@
 package com.hospitalar.sistema;
 
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class HospitalSistema {
     private static List<Paciente> listaDePacientes = new ArrayList<>();
     private static List<Medico> listaDeMedicos = new ArrayList<>();
     private static List<Especialidade> listaDeEspecialidades = new ArrayList<>();
+    private static List<Consulta> listaDeConsultas = new ArrayList<>();
 
     private static Scanner scanner = new Scanner(System.in);
 
@@ -17,13 +21,13 @@ public class HospitalSistema {
         inicializarEspecialidades();
 
         int opcao = 0;
-        while (opcao != 9){
+        while (opcao != 9) {
             exibirMenu();
             System.out.println("Escolha uma opcao: ");
             opcao = scanner.nextInt();
             scanner.nextLine();
 
-            switch (opcao){
+            switch (opcao) {
                 case 1:
                     cadastrarNovoPaciente();
                     break;
@@ -36,6 +40,9 @@ public class HospitalSistema {
                 case 4:
                     listarMedicos();
                     break;
+                case 5:
+                    agendarNovaConsulta();
+                    break;
                 case 9:
                     System.out.println("Encerrando o sistema...");
                 default:
@@ -46,21 +53,95 @@ public class HospitalSistema {
         scanner.close();
     }
 
-    private static void inicializarEspecialidades(){
+    private static void inicializarEspecialidades() {
         listaDeEspecialidades.add(new Especialidade("Cardiologia"));
         listaDeEspecialidades.add(new Especialidade("Pediatria"));
         listaDeEspecialidades.add(new Especialidade("Ortopedia"));
         listaDeEspecialidades.add(new Especialidade("Dermatologia"));
-   }
+    }
 
-    public static void exibirMenu(){
+    public static void exibirMenu() {
         System.out.println("\n--- MENU PRINCIPAL ---");
         System.out.println("1. Cadastrar Paciente");
         System.out.println("2. Listar Pacientes");
         System.out.println("3. Cadastrar Novo Médico");
+        System.out.println("5. Agendar Nova Consulta");
         System.out.println("4. Listar Medicos");
         System.out.println("9. Sair");
     }
+
+    private static void agendarNovaConsulta() {
+        System.out.println("\n--- Agendamento de Nova Consulta --- ");
+
+        if (listaDeConsultas.isEmpty()) {
+            System.out.println("Não há pacientes cadastrados. Cadastre um paciente primeiro");
+            return;
+        }
+
+        System.out.println("Selecione o paciente:");
+        for (int i = 0; i < listaDePacientes.size(); i++) {
+            System.out.println((i + 1) + ". " + listaDePacientes.get(i).getNome());
+        }
+
+        System.out.println("Opção: ");
+        int indicePaciente = scanner.nextInt() - 1;
+        scanner.nextLine();
+
+        if (listaDeMedicos.isEmpty()) {
+            System.out.println("Não há médicos. Cadastre um médico primeiro");
+            return;
+        }
+        System.out.println("Opção: ");
+        int indiceMedico = scanner.nextInt() - 1;
+        scanner.nextLine();
+
+        LocalDateTime dataHoraConsulta = null;
+        while (dataHoraConsulta == null) {
+            System.out.print("Digite a data da consulta (formato AAAA-MM-DD): ");
+            String data = scanner.nextLine();
+            System.out.print("Digite a hora consulta (formato HH:MM): ");
+            String hora = scanner.nextLine();
+            try {
+                dataHoraConsulta = LocalDateTime.parse(data + "T" + hora);
+            } catch (DateTimeParseException e) {
+                System.out.println("Formato de data/hora inválido. Por favor, tente novamente.");
+            }
+        }
+
+        System.out.print("Digite o local da consulta (ex: Consultório 101): ");
+        String local = scanner.nextLine();
+
+        try {
+            Paciente pacienteEscolhido = listaDePacientes.get(indicePaciente);
+            Medico medicoEscolhido = listaDeMedicos.get(indiceMedico);
+
+            for (Consulta consultaExistente : listaDeConsultas) {
+                if (consultaExistente.getDataHora().equals(dataHoraConsulta)) {
+
+                    if (consultaExistente.getMedico().equals(medicoEscolhido)) {
+                        System.out.println("ERRO: O Dr(a). " + medicoEscolhido.getNome() + " já tem uma consulta neste horário.");
+                        return;
+                    }
+                    if (consultaExistente.getLocal().equalsIgnoreCase(local)) {
+                        System.out.println("ERRO: O local '" + local + "' já está ocupado neste horário.");
+                        return;
+                    }
+                }
+            }
+
+            Consulta novaConsulta = new Consulta(pacienteEscolhido, medicoEscolhido, dataHoraConsulta, local);
+            listaDeConsultas.add(novaConsulta);
+            pacienteEscolhido.adicionarConsulta(novaConsulta);
+
+            System.out.println("\n--- Consulta Agendada com Sucesso! ----");
+            novaConsulta.exibirInformacoes();
+
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Opção de paciente ou médico inválida. Agendamento cancelado.");
+        }
+
+    }
+
     public static void cadastrarNovoPaciente(){
         System.out.println("\n--- Cadastro de Novo Paciente ---");
         System.out.print("Nome: ");
