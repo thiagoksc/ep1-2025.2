@@ -71,9 +71,10 @@ public class HospitalSistema {
     }
 
     private static void agendarNovaConsulta() {
+
         System.out.println("\n--- Agendamento de Nova Consulta --- ");
 
-        if (listaDeConsultas.isEmpty()) {
+        if (listaDePacientes.isEmpty()) {
             System.out.println("Não há pacientes cadastrados. Cadastre um paciente primeiro");
             return;
         }
@@ -160,7 +161,9 @@ public class HospitalSistema {
             String plano = scanner.nextLine();
             PacienteEspecial novoPaciente = new PacienteEspecial(nome, cpf, idade, plano);
             listaDePacientes.add(novoPaciente);
-            System.out.println("Paciente Especial cadastrado com sucesso!");
+            System.out.println("Paciente ESPECIAL cadastrado com sucesso!");
+
+
         } else{
             Paciente novoPaciente = new Paciente(nome, cpf, idade);
             listaDePacientes.add(novoPaciente);

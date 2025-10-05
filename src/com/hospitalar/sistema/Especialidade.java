@@ -10,8 +10,8 @@ public class Especialidade {
         return nome;
     }
 
-
-    public String  toString(String nome) {
-        return nome;
+    @Override
+    public String toString() {
+        return this.nome;
     }
 }
