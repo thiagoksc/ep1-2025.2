@@ -14,14 +14,16 @@ public class HospitalSistema {
     private static List<Especialidade> listaDeEspecialidades = new ArrayList<>();
     private static List<Consulta> listaDeConsultas = new ArrayList<>();
 
+
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         System.out.println("Bem-vindo ao Sistema de Gerenciamento Hospitalar!");
 
         listaDePacientes = GerenciadorDeArquivos.carregarPacientes();
+        listaDeEspecialidades = GerenciadorDeArquivos.carregarEspecialidades();
+        listaDeMedicos = GerenciadorDeArquivos.carregarMedicos(listaDeEspecialidades);
 
-        inicializarEspecialidades();
 
         int opcao = 0;
         while (opcao != 9) {
@@ -69,12 +71,7 @@ public class HospitalSistema {
         scanner.close();
     }
 
-    private static void inicializarEspecialidades() {
-        listaDeEspecialidades.add(new Especialidade("Cardiologia"));
-        listaDeEspecialidades.add(new Especialidade("Pediatria"));
-        listaDeEspecialidades.add(new Especialidade("Ortopedia"));
-        listaDeEspecialidades.add(new Especialidade("Dermatologia"));
-    }
+
 
     public static void exibirMenu() {
         System.out.println("\n--- MENU PRINCIPAL ---");
@@ -238,6 +235,7 @@ public class HospitalSistema {
 
             especialidadeEscolhida = new Especialidade(nomeNovaEspecialidade);
             listaDeEspecialidades.add(especialidadeEscolhida);
+            GerenciadorDeArquivos.salvarEspecialidade(listaDeEspecialidades);
             System.out.println("Nova especialidade '" + nomeNovaEspecialidade + "' foi cadastrada!");
         }
 
@@ -258,6 +256,7 @@ public class HospitalSistema {
 
             }
             listaDeMedicos.add(novoMedico);
+            GerenciadorDeArquivos.salvarMedicos(listaDeMedicos);
             System.out.println("Medico cadastrado com sucesso!");
         }else {
             System.out.println("Opção de Especialidade inválida. O cadastro foi cancelado");

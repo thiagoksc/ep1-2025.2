@@ -13,7 +13,7 @@ public class Internacao {
     private double custoDiaria;
     private StatusInternacao status;
 
-    public Internacao(Paciente paciente, Medico medicoResponsavel, String quarto, double custoDiaria) {
+    public Internacao(Paciente paciente, Medico medicoResponsavel, LocalDate dataEntrada, LocalDate dataSaida, String quarto, double custoDiaria, StatusInternacao status) {
         this.paciente = paciente;
         this.medicoResponsavel = medicoResponsavel;
         this.quarto = quarto;
