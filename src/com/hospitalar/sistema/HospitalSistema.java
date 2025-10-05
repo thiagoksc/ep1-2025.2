@@ -92,6 +92,11 @@ public class HospitalSistema {
             System.out.println("Não há médicos. Cadastre um médico primeiro");
             return;
         }
+        System.out.println("Selecione o medico:");
+        for (int i = 0; i < listaDeMedicos.size(); i++) {
+            System.out.println((i + 1) + ". Dr(a). " + listaDeMedicos.get(i).getNome());
+        }
+
         System.out.println("Opção: ");
         int indiceMedico = scanner.nextInt() - 1;
         scanner.nextLine();
