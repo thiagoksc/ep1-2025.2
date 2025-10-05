@@ -100,7 +100,7 @@ public class HospitalSistema {
         }
     }
 
-    public static void cadastrarNovoMedico(){
+    public static void cadastrarNovoMedico() {
         System.out.println("\n--- Cadastro de Novo Médico ---");
         System.out.print("Nome do Médico: ");
         String nome = scanner.nextLine();
@@ -111,12 +111,43 @@ public class HospitalSistema {
         scanner.nextLine();
 
         System.out.println("\nSelecione a Especialidade:");
-        for  (int i = 0; i < ListaDeEspecialidades.size(); i++) {
+        for (int i = 0; i < ListaDeEspecialidades.size(); i++) {
             System.out.println((i + 1) + ". " + ListaDeEspecialidades.get(i).getNome());
         }
         System.out.println((listaDeEspecialidades.size() + 1) + ". Outra (Cadastrar nova especialidade)");
 
         System.out.print("Digite o número da opção: ");
+        int escolha = scanner.nextInt();
+        scanner.nextLine();
+
+        Especialidade especialidadeEscolhida = null;
+
+        if (escolha > 0 && escolha <= listaDeEspecialidades.size()) {
+            especialidadeEscolhida = listaDeEspecialidades.get(escolha - 1);
+        } else if (escolha == listaDeEspecialidades.size() + 1) {
+            System.out.print("Digite o nome da especialidade: ");
+            String nomeNovaEspecialidade = scanner.nextLine();
+
+            especialidadeEscolhida = new Especialidade(nomeNovaEspecialidade);
+            listaDeEspecialidades.add(especialidadeEscolhida);
+            System.out.println("Nova especialidade '" + nomeNovaEspecialidade + "' foi cadastrada!");
+        }
+
+        if (especialidadeEscolhida != null) {
+            Medico novoMedico  = new Medico(nome, crm, especialidadeEscolhida, custo);
+
+            System.out.print("Deseja adicionar horários para este médico agora? (S/N): ");
+            if (scanner.nextLine().equalsIgnoreCase("S")){
+                System.out.println("Digite os horários disponíveis (ex: 14:00). Digite 'fim' para parar.");
+                String horario = "";
+                while (!horario.equalsIgnoreCase("fim")) {
+                    System.out.print("Horário: ");
+                    horario = scanner.nextLine();
+                    if (!horario.equalsIgnoreCase("fim")) {
+                        novoMedico.adicionarHorario(horario);
+            }
+        }
+
     }
     private static void listarMedicos(){
         System.out.println("\n--- Lista de Medicos Cadastrados ---");
