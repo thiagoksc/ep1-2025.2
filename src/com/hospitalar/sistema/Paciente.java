@@ -31,4 +31,8 @@ public class Paciente {
         System.out.println("CPF: " + cpf);
         System.out.println("Idade: " + idade);
     }
+
+    public void adicionarConsulta(Consulta consulta){
+        this.historicoConsultas.add(consulta);
+    }
 }

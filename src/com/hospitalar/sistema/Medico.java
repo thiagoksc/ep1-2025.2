@@ -38,4 +38,7 @@ public class Medico {
     public String getCrm() {
         return crm;
     }
+    public double getCustoConsulta() {
+        return custoConsulta;
+    }
 }
