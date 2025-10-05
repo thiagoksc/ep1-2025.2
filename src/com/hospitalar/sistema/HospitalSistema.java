@@ -18,6 +18,8 @@ public class HospitalSistema {
     public static void main(String[] args) {
         System.out.println("Bem-vindo ao Sistema de Gerenciamento Hospitalar!");
 
+        listaDePacientes = GerenciadorDeArquivos.carregarPacientes();
+
         inicializarEspecialidades();
 
         int opcao = 0;
@@ -178,6 +180,7 @@ public class HospitalSistema {
             listaDePacientes.add(novoPaciente);
             System.out.println("Paciente cadastrado com sucesso!");
         }
+        GerenciadorDeArquivos.salvarPacientes(listaDePacientes);
     }
 
     private static void listarPacientes(){
