@@ -7,12 +7,14 @@ import java.util.Scanner;
 public class HospitalSistema {
     private static List<Paciente> listaDePacientes = new ArrayList<>();
     private static List<Medico> listaDeMedicos = new ArrayList<>();
-    private static List<Especialidade> ListadeEspecialidades = new ArrayList<>();
+    private static List<Especialidade> ListaDeEspecialidades = new ArrayList<>();
 
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         System.out.println("Bem-vindo ao Sistema de Gerenciamento Hospitalar!");
+
+        inicializarEspecialidade();
 
         int opcao = 0;
         while (opcao != 9){
@@ -44,9 +46,9 @@ public class HospitalSistema {
         scanner.close();
     }
 
-    private static void inicializarEspecialidade(){
+    private static void inicializarEspecialidades(){
         listaDeEspecialidades.add(new Especialidade("Cardiologia"));
-        listadeEspecialidades.add(new Especialidade("Pediatria"));
+        listaDeEspecialidades.add(new Especialidade("Pediatria"));
         listaDeEspecialidades.add(new Especialidade("Ortopedia"));
         listaDeEspecialidades.add(new Especialidade("Dermatologia"));
    }
@@ -107,6 +109,26 @@ public class HospitalSistema {
         System.out.print("Custo da Consulta: R$ ");
         double custo = scanner.nextDouble();
         scanner.nextLine();
+
+        System.out.println("\nSelecione a Especialidade:");
+        for  (int i = 0; i < ListaDeEspecialidades.size(); i++) {
+            System.out.println((i + 1) + ". " + ListaDeEspecialidades.get(i).getNome());
+        }
+        System.out.println((listaDeEspecialidades.size() + 1) + ". Outra (Cadastrar nova especialidade)");
+
+        System.out.print("Digite o número da opção: ");
+    }
+    private static void listarMedicos(){
+        System.out.println("\n--- Lista de Medicos Cadastrados ---");
+        if  (listaDeMedicos.isEmpty()){
+            System.out.println("Nenhum medico cadastrado ainda.");
+            return;
+        }
+        for (int i = 0; i < listaDeMedicos.size(); i++) {
+            Medico m =  listaDeMedicos.get(i);
+            System.out.println("\n--- Medico " + (i + 1) + "---");
+            m.exibirInformacoes();
+        }
     }
 
 }

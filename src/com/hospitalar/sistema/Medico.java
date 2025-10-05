@@ -6,7 +6,7 @@ import java.util.List;
 public class Medico {
     private String nome;
     private String crm;
-    private String Especialidade especialidade;
+    private Especialidade especialidade;
     private double custoConsulta;
     private List<String> agendaDisponivel;
 
