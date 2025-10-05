@@ -29,12 +29,24 @@ public class Consulta {
    }
     private void  calcularCustoFinal() {
        double custoBase = this.medico.getCustoConsulta();
+       double descontoFinal = 0.0;
+       String motivoDesconto = "Nenhum";
 
-       if (this.paciente instanceof PacienteEspecial) {
-           this.custoFinal = custoBase - (custoBase * DESCONTO_PLANO_SAUDE);
-           System.out.println("INFO: Desconto de 20% aplicado para paciente com plano de saúde.");
-       }else {
-           this.custoFinal = custoBase;
+       if (this.paciente.getIdade() >= 60) {
+           descontoFinal = 0.30;
+           motivoDesconto = "Idade (60+)";
+       }
+       else if (this.paciente instanceof PacienteEspecial) {
+           PacienteEspecial pe = (PacienteEspecial) this.paciente;
+           PlanoDeSaude plano = pe.getPlanoDeSaude();
+           String nomeEspecialidade = this.medico.getEspecialidade().getNome();
+
+           descontoFinal = plano.getDesconto(nomeEspecialidade);
+           motivoDesconto = "Plano de Saúde (" + plano.getNome() + ")";
+       }
+       this.custoFinal = custoBase - (custoBase * descontoFinal);
+       if(descontoFinal > 0) {
+           System.out.println("INFO: Desconto de " + (int)(descontoFinal * 100) + "% aplicado. Movtivo: " + motivoDesconto);
        }
     }
 
