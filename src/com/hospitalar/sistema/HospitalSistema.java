@@ -2,6 +2,7 @@ package com.hospitalar.sistema;
 
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.time.LocalDateTime;
@@ -26,9 +27,16 @@ public class HospitalSistema {
         while (opcao != 9) {
             exibirMenu();
             System.out.println("Escolha uma opcao: ");
-            opcao = scanner.nextInt();
-            scanner.nextLine();
 
+            try {
+                opcao = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("\nERRO: Por favor, digite apenas números para escolher uma opção.");
+                opcao = 0;
+            }finally {
+
+                scanner.nextLine();
+            }
             switch (opcao) {
                 case 1:
                     cadastrarNovoPaciente();
