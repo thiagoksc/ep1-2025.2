@@ -56,6 +56,9 @@ public class HospitalSistema {
                 case 6:
                     concluirConsulta();
                     break;
+                case 7:
+                    excluirPaciente();
+                    break;
                 case 9:
                     System.out.println("Encerrando o sistema...");
                 default:
@@ -80,7 +83,8 @@ public class HospitalSistema {
         System.out.println("3. Cadastrar Novo Médico");
         System.out.println("4. Listar Médicos");
         System.out.println("5. Agendar Nova Consulta");
-        System.out.println("6. Concluirt Consultar e Registrar Diagnóstico");
+        System.out.println("6. Concluir Consulta e Registrar Diagnóstico");
+        System.out.println("7. Excluir Paciente");
         System.out.println("9. Sair");
     }
 
@@ -292,12 +296,12 @@ public class HospitalSistema {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy  HH:mm");
         for (int i = 0; i < consultasAgendadas.size(); i++) {
             Consulta c = consultasAgendadas.get(i);
-            System.out.println((i + i) + ". Pacinte: " + c.getPaciente().getNome() + " | Médico: " + c.getMedico().getNome() + " | Data: " + c.getDataHora().format(formatter));
+            System.out.println((i + 1) + ". Pacinte: " + c.getPaciente().getNome() + " | Médico: " + c.getMedico().getNome() + " | Data: " + c.getDataHora().format(formatter));
 
         }
 
         System.out.println("Opção: ");
-        int indiceConsulta = scanner.nextInt();
+        int indiceConsulta = scanner.nextInt() - 1;
         scanner.nextLine();
 
         try {
@@ -314,6 +318,39 @@ public class HospitalSistema {
             System.out.println("\nConsulta concluída e diagnóstico registrado com sucesso!");
 
         } catch (IndexOutOfBoundsException e) {
+            System.out.println("Opção inválida. Operação cancelada.");
+        }
+    }
+    public static void excluirPaciente() {
+        System.out.println("\n--- Excluir Paciente ---");
+
+        if (listaDePacientes.isEmpty()) {
+            System.out.println("Não há pacientes cadastrados para excluir.");
+            return;
+        }
+
+        System.out.println("Selecione o paciente que deseja excluir:");
+        for (int i = 0; i < listaDePacientes.size(); i++) {
+            System.out.println((i + 1) + ". " + listaDePacientes.get(i).getNome() + " (CPF: " + listaDePacientes.get(i).getCpf() + ")");
+        }
+
+        System.out.print("\nDigite o número do paciente (ou 0 para cancelar): ");
+        int escolha = scanner.nextInt();
+        scanner.nextLine();
+
+        if (escolha == 0) {
+            System.out.println("Operação cancelada.");
+            return;
+        }
+
+        if (escolha > 0 && escolha <= listaDePacientes.size()) {
+            int indiceParaExcluir = escolha - 1;
+            String nomeExcluido = listaDePacientes.get(indiceParaExcluir).getNome();
+            GerenciadorDeArquivos.salvarPacientes(listaDePacientes);
+
+            System.out.println("Paciente '" + nomeExcluido + "' foi excluído com sucesso!");
+
+        } else {
             System.out.println("Opção inválida. Operação cancelada.");
         }
     }
