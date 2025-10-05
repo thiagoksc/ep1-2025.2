@@ -41,4 +41,11 @@ public class Medico {
     public double getCustoConsulta() {
         return custoConsulta;
     }
+    public Especialidade getEspecialidade() {
+        return especialidade;
+    }
+
+    public List<String> getAgendaDisponivel() {
+        return agendaDisponivel;
+    }
 }

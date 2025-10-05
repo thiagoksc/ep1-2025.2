@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Paciente {
+    public String getNome;
     private String nome;
     private String cpf;
     private int idade;
