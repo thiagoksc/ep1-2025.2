@@ -80,6 +80,8 @@ public class Menu {
             System.out.println("2. Relatório de Pacientes Internados");
             System.out.println("3. Relatório de Médicos (com N° de Consultas)");
             System.out.println("4. Relatório de Estatísticas Gerais");
+            System.out.println("5. Relatório de Consultas (com Filtros)");
+            System.out.println("6. Relatório de Planos de Saúde (Uso e Economia)");
             System.out.println("9. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção de relatório: ");
 
@@ -97,6 +99,8 @@ public class Menu {
                 case 2: HospitalSistema.gerarRelatorioInternacoesAtivas(); break;
                 case 3: HospitalSistema.gerarRelatorioMedicosDetalhado(); break;
                 case 4: HospitalSistema.gerarRelatorioEstatisticasGerais(); break;
+                case 5: HospitalSistema.gerarRelatorioConsultasComFiltros(); break; // NOVA CHAMADA
+                case 6: HospitalSistema.gerarRelatorioPlanosDeSaude(); break; // NOVA CHAMADA
                 case 9: System.out.println("Retornando ao menu principal..."); break;
                 default: System.out.println("Opção inválida.");
             }

@@ -102,6 +102,97 @@ public class HospitalSistema {
         }
     }
 
+    public static void gerarRelatorioConsultasComFiltros() {
+        System.out.println("\n--- Relatório de Consultas com Filtros ---");
+        System.out.println("1. Listar Todas as Consultas");
+        System.out.println("2. Listar Consultas Futuras");
+        System.out.println("3. Listar Consultas Passadas");
+        System.out.print("Escolha o filtro: ");
+
+        Scanner scannerRelatorio = new Scanner(System.in);
+        int escolha = scannerRelatorio.nextInt();
+        scannerRelatorio.nextLine();
+
+        List<Consulta> consultasFiltradas = new ArrayList<>();
+        LocalDateTime agora = LocalDateTime.now();
+
+        switch (escolha) {
+            case 1:
+                consultasFiltradas.addAll(listaDeConsultas);
+                System.out.println("\nExibindo TODAS as consultas agendadas:");
+                break;
+            case 2:
+                for (Consulta c : listaDeConsultas) {
+                    if (c.getDataHora().isAfter(agora)) {
+                        consultasFiltradas.add(c);
+                    }
+                }
+                System.out.println("\nExibindo consultas FUTURAS:");
+                break;
+            case 3:
+                for (Consulta c : listaDeConsultas) {
+                    if (c.getDataHora().isBefore(agora)) {
+                        consultasFiltradas.add(c);
+                    }
+                }
+                System.out.println("\nExibindo consultas PASSADAS:");
+                break;
+            default:
+                System.out.println("Opção inválida.");
+                return;
+        }
+
+        if (consultasFiltradas.isEmpty()) {
+            System.out.println("Nenhuma consulta encontrada para este filtro.");
+        } else {
+            for (Consulta c : consultasFiltradas) {
+                System.out.println("--------------------");
+                c.exibirInformacoes();
+            }
+        }
+    }
+
+    public static void gerarRelatorioPlanosDeSaude() {
+        System.out.println("\n--- Relatório de Uso e Economia dos Planos de Saúde ---");
+        if (listaDePlanos.isEmpty()) {
+            System.out.println("Nenhum plano de saúde cadastrado.");
+            return;
+        }
+
+        for (PlanoDeSaude plano : listaDePlanos) {
+            int contagemPacientes = 0;
+            double economiaTotal = 0.0;
+
+
+            for (Paciente paciente : listaDePacientes) {
+                if (paciente instanceof PacienteEspecial) {
+                    PacienteEspecial pe = (PacienteEspecial) paciente;
+                    if (pe.getPlanoDeSaude().equals(plano)) {
+                        contagemPacientes++;
+                    }
+                }
+            }
+
+
+            for (Consulta consulta : listaDeConsultas) {
+                Paciente paciente = consulta.getPaciente();
+                if (paciente instanceof PacienteEspecial) {
+                    PacienteEspecial pe = (PacienteEspecial) paciente;
+                    if (pe.getPlanoDeSaude().equals(plano)) {
+                        double custoBase = consulta.getMedico().getCustoConsulta();
+                        double custoComDesconto = consulta.getCustoFinal();
+                        economiaTotal += (custoBase - custoComDesconto);
+                    }
+                }
+            }
+
+            System.out.println("Plano: " + plano.getNome());
+            System.out.println("  -> Número de Pacientes Associados: " + contagemPacientes);
+            System.out.println("  -> Economia Total Gerada em Consultas: R$ " + String.format("%.2f", economiaTotal));
+            System.out.println("==========================================");
+        }
+    }
+
     public static void gerarRelatorioMedicosDetalhado() {
         System.out.println("\n--- Relatório Detalhado de Médicos ---");
         if (listaDeMedicos.isEmpty()) {
@@ -222,6 +313,7 @@ public class HospitalSistema {
             System.out.println("Nenhum paciente internado no momento.");
         }
     }
+
 
     public static void cadastrarNovoPaciente() {
         System.out.println("\n--- Cadastro de Novo Paciente ---");
