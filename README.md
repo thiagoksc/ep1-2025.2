@@ -20,16 +20,19 @@ Desenvolvimento de um sistema de gerenciamento hospitalar utilizando os conceito
 ## Instruções para Compilação e Execução
 
 1. **Compilação:**  
-   [Descrever aqui como compilar o projeto. Exemplo: `javac Main.java` ou o script usado]
+   [usando VS Code ou Intelij basta da um git clone ]
 
 2. **Execução:**  
-   [Descrever aqui como executar o projeto. Exemplo: `java Main` ou o script usado]
+   [A main está localizada na classe HospitalSistema, basta da Run Java nela]
 
 3. **Estrutura de Pastas:**  
-   [Descrever aqui as principais pastas do projeto]
+   [Todas as classes estão localizadas em uma única pasta chamada com.hospitalar.sistema]
 
 3. **Versão do JAVA utilizada:**  
-   [Descrever aqui como versão do JAVA utilizada no projeto. Sugestão: `java 21`]
+   [java -version
+openjdk version "17.0.16" 2025-07-15 LTS
+OpenJDK Runtime Environment Zulu17.60+17-CA (build 17.0.16+8-LTS)
+OpenJDK 64-Bit Server VM Zulu17.60+17-CA (build 17.0.16+8-LTS, mixed mode, sharing)]
 
 ---
 
@@ -66,7 +69,7 @@ Desenvolvimento de um sistema de gerenciamento hospitalar utilizando os conceito
 
 ## Contato
 
-- [Opcional: E-mail pessoal do aluno.]
+- [thiagoksc20@gmail.com]
 
 ---
 
