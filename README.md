@@ -46,7 +46,8 @@ Desenvolvimento de um sistema de gerenciamento hospitalar utilizando os conceito
 
 
 2. Cadastro de Médico:  
-   ![Inserir Print 2](caminho/do/print2.png)
+   <img width="1763" height="748" alt="Captura de tela 2025-10-06 105424" src="https://github.com/user-attachments/assets/bb4f441f-128b-4c63-9e7e-a1c9cd913198" />
+
 
 3. Relatório de ?:  
    <img width="1763" height="748" alt="Captura de tela 2025-10-06 105424" src="https://github.com/user-attachments/assets/b0a4b481-ffcc-40fa-94a5-59f61f3ace8a" />
