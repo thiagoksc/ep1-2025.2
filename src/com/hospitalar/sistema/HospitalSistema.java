@@ -41,7 +41,7 @@ public class HospitalSistema {
         }
 
         int opcao = 0;
-        while (opcao != 15) {
+        while (opcao != 16) {
             exibirMenuPrincipal();
             System.out.print("Escolha uma opção: ");
 
@@ -60,18 +60,19 @@ public class HospitalSistema {
                 case 3: excluirPaciente(); break;
                 case 4: cadastrarNovoMedico(); break;
                 case 5: listarMedicos(); break;
-                case 6: cadastrarPlanoDeSaude(); break;
-                case 7: configurarDescontosPlano(); break;
-                case 8: agendarNovaConsulta(); break;
-                case 9: concluirConsulta(); break;
-                case 10: registrarNovaInternacao(); break;
-                case 11: registrarAltaPaciente(); break;
-                case 12: cancelarInternacao(); break;
-                case 13: listarInternacoes(); break;
-                case 14: exibirMenuRelatorios(); break;
-                case 15: System.out.println("Encerrando o sistema..."); break;
+                case 6: excluirMedico(); break;
+                case 7: cadastrarPlanoDeSaude(); break;
+                case 8: configurarDescontosPlano(); break;
+                case 9: agendarNovaConsulta(); break;
+                case 10: concluirConsulta(); break;
+                case 11: registrarNovaInternacao(); break;
+                case 12: registrarAltaPaciente(); break;
+                case 13: cancelarInternacao(); break;
+                case 14: listarInternacoes(); break;
+                case 15: exibirMenuRelatorios(); break;
+                case 16: System.out.println("Encerrando o sistema..."); break;
                 default:
-                    if (opcao != 15) {
+                    if (opcao != 16) {
                         System.out.println("Opção inválida. Tente novamente.");
                     }
             }
@@ -90,21 +91,78 @@ public class HospitalSistema {
         System.out.println("--- Médicos e Planos ---");
         System.out.println("4. Cadastrar Novo Médico");
         System.out.println("5. Listar Médicos");
-        System.out.println("6. Cadastrar Plano de Saúde");
-        System.out.println("7. Configurar Descontos de um Plano");
+        System.out.println("6. Excluir Médico");
+        System.out.println("7. Cadastrar Plano de Saúde");
+        System.out.println("8. Configurar Descontos de um Plano");
         System.out.println("--- Atendimentos ---");
-        System.out.println("8. Agendar Nova Consulta");
-        System.out.println("9. Concluir Consulta e Registrar Diagnóstico");
-        System.out.println("10. Registrar Nova Internação");
-        System.out.println("11. Registrar Alta de Paciente");
-        System.out.println("12. Cancelar Internação");
-        System.out.println("13. Listar Internações");
+        System.out.println("9. Agendar Nova Consulta");
+        System.out.println("10. Concluir Consulta e Registrar Diagnóstico");
+        System.out.println("11. Registrar Nova Internação");
+        System.out.println("12. Registrar Alta de Paciente");
+        System.out.println("13. Cancelar Internação");
+        System.out.println("14. Listar Internações");
         System.out.println("--- Sistema ---");
-        System.out.println("14. Módulo de Relatórios");
-        System.out.println("15. Sair");
+        System.out.println("15. Módulo de Relatórios");
+        System.out.println("16. Sair");
     }
 
+    private static void excluirMedico() {
+        System.out.println("\n--- Excluir Médico ---");
+        if (listaDeMedicos.isEmpty()) {
+            System.out.println("Não há médicos cadastrados para excluir.");
+            return;
+        }
 
+        System.out.println("Selecione o médico que deseja excluir:");
+        for (int i = 0; i < listaDeMedicos.size(); i++) {
+            System.out.println((i + 1) + ". " + listaDeMedicos.get(i).getNome() + " (CRM: " + listaDeMedicos.get(i).getCrm() + ")");
+        }
+
+        System.out.print("\nDigite o número do médico (ou 0 para cancelar): ");
+        int escolha = scanner.nextInt();
+        scanner.nextLine();
+
+        if (escolha == 0) {
+            System.out.println("Operação cancelada.");
+            return;
+        }
+
+        if (escolha > 0 && escolha <= listaDeMedicos.size()) {
+            int indiceParaExcluir = escolha - 1;
+            Medico medicoParaExcluir = listaDeMedicos.get(indiceParaExcluir);
+
+            // --- VERIFICAÇÃO DE INTEGRIDADE ---
+            boolean medicoTemVinculo = false;
+            // Verifica se o médico está em alguma consulta
+            for (Consulta consulta : listaDeConsultas) {
+                if (consulta.getMedico().equals(medicoParaExcluir)) {
+                    medicoTemVinculo = true;
+                    break;
+                }
+            }
+
+            if (!medicoTemVinculo) {
+                for (Internacao internacao : listaDeInternacoes) {
+                    if (internacao.getMedicoResponsavel().equals(medicoParaExcluir)) {
+                        medicoTemVinculo = true;
+                        break;
+                    }
+                }
+            }
+
+            if (medicoTemVinculo) {
+                System.out.println("\nERRO: Não é possível excluir o Dr(a). " + medicoParaExcluir.getNome() +
+                        " pois ele(a) está vinculado(a) a consultas ou internações existentes.");
+            } else {
+                // Se não houver vínculos, pode excluir
+                listaDeMedicos.remove(indiceParaExcluir);
+                GerenciadorDeArquivos.salvarMedicos(listaDeMedicos);
+                System.out.println("Médico '" + medicoParaExcluir.getNome() + "' foi excluído com sucesso!");
+            }
+        } else {
+            System.out.println("Opção inválida. Operação cancelada.");
+        }
+    }
 
     private static void exibirMenuRelatorios() {
         int opcao = 0;
