@@ -10,10 +10,10 @@ Desenvolvimento de um sistema de gerenciamento hospitalar utilizando os conceito
 
 ## Dados do Aluno
 
-- **Nome completo:** [Preencher aqui]
-- **Matrícula:** [Preencher aqui]
-- **Curso:** [Preencher aqui]
-- **Turma:** [Preencher aqui]
+- **Nome completo:** [Thiago Kauã de Sousa Cardoso]
+- **Matrícula:** [242015719]
+- **Curso:** [Engenharias]
+- **Turma:** [02]
 
 ---
 
