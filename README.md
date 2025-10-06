@@ -20,10 +20,10 @@ Desenvolvimento de um sistema de gerenciamento hospitalar utilizando os conceito
 ## Instruções para Compilação e Execução
 
 1. **Compilação:**  
-   [usando VS Code ou Intelij basta da um git clone https://github.com/thiagoksc/ep1-2025.2]
+   [usando VS Code ou Intelij basta dá um git clone https://github.com/thiagoksc/ep1-2025.2]
 
 2. **Execução:**  
-   [A main está localizada na classe HospitalSistema, basta da Run Java nela]
+   [A main está localizada na classe HospitalSistema, basta dá Run Java nela]
 
 3. **Estrutura de Pastas:**  
    [Todas as classes estão localizadas em: src\com.hospitalar.sistema]
