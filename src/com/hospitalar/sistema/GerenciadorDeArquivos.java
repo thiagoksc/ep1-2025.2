@@ -1,4 +1,3 @@
-// Arquivo: com/hospital/sistema/GerenciadorDeArquivos.java
 package com.hospitalar.sistema;
 
 import java.io.*;
