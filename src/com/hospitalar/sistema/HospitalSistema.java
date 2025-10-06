@@ -1,97 +1,74 @@
 package com.hospitalar.sistema;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.InputMismatchException;
-
 
 public class HospitalSistema {
-    private static List<Paciente> listaDePacientes = new ArrayList<>();
-    private static List<Medico> listaDeMedicos = new ArrayList<>();
-    private static List<Especialidade> listaDeEspecialidades = new ArrayList<>();
+
+
+    private static List<Paciente> listaDePacientes;
+    private static List<Medico> listaDeMedicos;
+    private static List<Especialidade> listaDeEspecialidades;
+    private static List<PlanoDeSaude> listaDePlanos;
     private static List<Consulta> listaDeConsultas = new ArrayList<>();
-    private static List<Internacao> listaDeInternacoes = new ArrayList<>();
+    private static List<Internacao> listaDeInternacoes;
 
-
-    private static Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         System.out.println("Bem-vindo ao Sistema de Gerenciamento Hospitalar!");
 
-        listaDePacientes = GerenciadorDeArquivos.carregarPacientes();
+
+        listaDePlanos = GerenciadorDeArquivos.carregarPlanos();
         listaDeEspecialidades = GerenciadorDeArquivos.carregarEspecialidades();
+        listaDePacientes = GerenciadorDeArquivos.carregarPacientes(listaDePlanos);
         listaDeMedicos = GerenciadorDeArquivos.carregarMedicos(listaDeEspecialidades);
         listaDeInternacoes = GerenciadorDeArquivos.carregarInternacoes(listaDePacientes, listaDeMedicos);
 
-        if (listaDeEspecialidades.isEmpty()){
-            System.out.println("INFO: Nenhuma especialidade encontrada. Criando lista padrão e salvando no arquivo...");
+        if (listaDeEspecialidades.isEmpty()) {
+            System.out.println("INFO: Nenhuma especialidade encontrada. Criando lista padrão...");
             listaDeEspecialidades.add(new Especialidade("Cardiologia"));
             listaDeEspecialidades.add(new Especialidade("Pediatria"));
             listaDeEspecialidades.add(new Especialidade("Ortopedia"));
-            listaDeEspecialidades.add(new Especialidade("Dermatologia"));
             GerenciadorDeArquivos.salvarEspecialidades(listaDeEspecialidades);
         }
 
-
-
-
         int opcao = 0;
-        while (opcao != 12) {
+        while (opcao != 15) {
             exibirMenu();
-            System.out.print("Escolha uma opcao: ");
+            System.out.print("Escolha uma opção: ");
 
             try {
                 opcao = scanner.nextInt();
             } catch (InputMismatchException e) {
-                System.out.println("\nERRO: Por favor, digite apenas números para escolher uma opção.");
+                System.out.println("\nERRO: Por favor, digite apenas números.");
                 opcao = 0;
-            }finally {
-
+            } finally {
                 scanner.nextLine();
             }
+
             switch (opcao) {
-                case 1:
-                    cadastrarNovoPaciente();
-                    break;
-                case 2:
-                    listarPacientes();
-                    break;
-                case 3:
-                    cadastrarNovoMedico();
-                    break;
-                case 4:
-                    listarMedicos();
-                    break;
-                case 5:
-                    agendarNovaConsulta();
-                    break;
-                case 6:
-                    concluirConsulta();
-                    break;
-                case 7:
-                    excluirPaciente();
-                    break;
-                case 8:
-                    registrarNovaInternacao();
-                    break;
-                case 9:
-                    registrarAltaPaciente();
-                    break;
-                case 10:
-                    cancelarInternacao();
-                    break;
-                case 11:
-                    listarInternacoes();
-                    break;
-                case 12:
-                    System.out.println("Encerrando o sistema...");
+                case 1: cadastrarNovoPaciente(); break;
+                case 2: listarPacientes(); break;
+                case 3: excluirPaciente(); break;
+                case 4: cadastrarNovoMedico(); break;
+                case 5: listarMedicos(); break;
+                case 6: cadastrarPlanoDeSaude(); break;
+                case 7: configurarDescontosPlano(); break;
+                case 8: agendarNovaConsulta(); break;
+                case 9: concluirConsulta(); break;
+                case 10: registrarNovaInternacao(); break;
+                case 11: registrarAltaPaciente(); break;
+                case 12: cancelarInternacao(); break;
+                case 13: listarInternacoes(); break;
+                case 15: System.out.println("Encerrando o sistema..."); break;
                 default:
-                    if (opcao != 12) {
+                    if (opcao != 15) {
                         System.out.println("Opção inválida. Tente novamente.");
                     }
             }
@@ -99,67 +76,116 @@ public class HospitalSistema {
         scanner.close();
     }
 
-
-
-    public static void exibirMenu() {
+    private static void exibirMenu() {
         System.out.println("\n--- MENU PRINCIPAL ---");
-        System.out.println("1. Cadastrar Paciente");
+        System.out.println("--- Pacientes ---");
+        System.out.println("1. Cadastrar Novo Paciente");
         System.out.println("2. Listar Pacientes");
-        System.out.println("3. Cadastrar Novo Médico");
-        System.out.println("4. Listar Médicos");
-        System.out.println("5. Agendar Nova Consulta");
-        System.out.println("6. Concluir Consulta e Registrar Diagnóstico");
-        System.out.println("7. Excluir Paciente");
-        System.out.println("8. Registrar Nova Internação");
-        System.out.println("9. Registrar Alta de Paciente");
-        System.out.println("10. Cancelar Internação");
-        System.out.println("11. Listar Internações");
-        System.out.println("12. Sair");
+        System.out.println("3. Excluir Paciente");
+        System.out.println("--- Médicos e Planos ---");
+        System.out.println("4. Cadastrar Novo Médico");
+        System.out.println("5. Listar Médicos");
+        System.out.println("6. Cadastrar Plano de Saúde");
+        System.out.println("7. Configurar Descontos de um Plano");
+        System.out.println("--- Atendimentos ---");
+        System.out.println("8. Agendar Nova Consulta");
+        System.out.println("9. Concluir Consulta e Registrar Diagnóstico");
+        System.out.println("10. Registrar Nova Internação");
+        System.out.println("11. Registrar Alta de Paciente");
+        System.out.println("12. Cancelar Internação");
+        System.out.println("13. Listar Internações");
+        System.out.println("--------------------");
+        System.out.println("15. Sair");
     }
 
-    public static void cadastrarNovoPaciente(){
+    private static void cadastrarNovoPaciente() {
         System.out.println("\n--- Cadastro de Novo Paciente ---");
-        System.out.print("Nome: ");
-        String nome = scanner.nextLine();
         System.out.print("CPF: ");
         String cpf = scanner.nextLine();
+        for (Paciente p : listaDePacientes) {
+            if (p.getCpf().equals(cpf)) {
+                System.out.println("\nERRO: Já existe um paciente com este CPF.");
+                return;
+            }
+        }
+        System.out.print("Nome: ");
+        String nome = scanner.nextLine();
         System.out.print("Idade: ");
         int idade = scanner.nextInt();
         scanner.nextLine();
-
         System.out.print("O paciente tem plano de saúde? (S/N): ");
         String temPlano = scanner.nextLine();
 
-        if (temPlano.equalsIgnoreCase("S")){
-            System.out.print("Qual o plano de saúde?");
-            String plano = scanner.nextLine();
-            PacienteEspecial novoPaciente = new PacienteEspecial(nome, cpf, idade, plano);
-            listaDePacientes.add(novoPaciente);
-            System.out.println("Paciente ESPECIAL cadastrado com sucesso!");
-
-
-        } else{
+        if (temPlano.equalsIgnoreCase("S")) {
+            if (listaDePlanos.isEmpty()) {
+                System.out.println("ERRO: Nenhum plano de saúde cadastrado. Cadastre um plano primeiro (opção 6).");
+                return;
+            }
+            System.out.println("Selecione o plano de saúde:");
+            for (int i = 0; i < listaDePlanos.size(); i++) {
+                System.out.println((i + 1) + ". " + listaDePlanos.get(i).getNome());
+            }
+            System.out.print("Opção: ");
+            int escolhaPlano = scanner.nextInt() - 1;
+            scanner.nextLine();
+            if (escolhaPlano >= 0 && escolhaPlano < listaDePlanos.size()) {
+                PlanoDeSaude planoEscolhido = listaDePlanos.get(escolhaPlano);
+                PacienteEspecial novoPaciente = new PacienteEspecial(nome, cpf, idade, planoEscolhido);
+                listaDePacientes.add(novoPaciente);
+                System.out.println("Paciente ESPECIAL cadastrado com sucesso!");
+            } else {
+                System.out.println("Opção de plano inválida. Cadastro cancelado.");
+                return;
+            }
+        } else {
             Paciente novoPaciente = new Paciente(nome, cpf, idade);
             listaDePacientes.add(novoPaciente);
-            System.out.println("Paciente cadastrado com sucesso!");
+            System.out.println("Paciente COMUM cadastrado com sucesso!");
         }
         GerenciadorDeArquivos.salvarPacientes(listaDePacientes);
     }
 
-    private static void listarPacientes(){
+    private static void listarPacientes() {
         System.out.println("\n--- Lista de Pacientes Cadastrados ---");
-        if  (listaDePacientes.isEmpty()){
+        if (listaDePacientes.isEmpty()) {
             System.out.println("Nenhum paciente cadastrado ainda.");
             return;
         }
         for (int i = 0; i < listaDePacientes.size(); i++) {
-            Paciente p =  listaDePacientes.get(i);
-            System.out.println("\n--- Paciente " + (i + 1) + "---");
-            p.exibirInformacoes();
+            System.out.println("\n--- Paciente " + (i + 1) + " ---");
+            listaDePacientes.get(i).exibirInformacoes();
         }
     }
 
-    public static void cadastrarNovoMedico() {
+    private static void excluirPaciente() {
+        System.out.println("\n--- Excluir Paciente ---");
+        if (listaDePacientes.isEmpty()) {
+            System.out.println("Não há pacientes cadastrados para excluir.");
+            return;
+        }
+        System.out.println("Selecione o paciente que deseja excluir:");
+        for (int i = 0; i < listaDePacientes.size(); i++) {
+            System.out.println((i + 1) + ". " + listaDePacientes.get(i).getNome() + " (CPF: " + listaDePacientes.get(i).getCpf() + ")");
+        }
+        System.out.print("\nDigite o número do paciente (ou 0 para cancelar): ");
+        int escolha = scanner.nextInt();
+        scanner.nextLine();
+        if (escolha == 0) {
+            System.out.println("Operação cancelada.");
+            return;
+        }
+        if (escolha > 0 && escolha <= listaDePacientes.size()) {
+            int indiceParaExcluir = escolha - 1;
+            String nomeExcluido = listaDePacientes.get(indiceParaExcluir).getNome();
+            listaDePacientes.remove(indiceParaExcluir);
+            GerenciadorDeArquivos.salvarPacientes(listaDePacientes);
+            System.out.println("Paciente '" + nomeExcluido + "' foi excluído com sucesso!");
+        } else {
+            System.out.println("Opção inválida. Operação cancelada.");
+        }
+    }
+
+    private static void cadastrarNovoMedico() {
         System.out.println("\n--- Cadastro de Novo Médico ---");
         System.out.print("Nome do Médico: ");
         String nome = scanner.nextLine();
@@ -168,34 +194,27 @@ public class HospitalSistema {
         System.out.print("Custo da Consulta: R$ ");
         double custo = scanner.nextDouble();
         scanner.nextLine();
-
         System.out.println("\nSelecione a Especialidade:");
         for (int i = 0; i < listaDeEspecialidades.size(); i++) {
-            System.out.println((i + 1) + ". " + listaDeEspecialidades.get(i).getNome());
+            System.out.println((i + 1) + ". " + listaDeEspecialidades.get(i));
         }
         System.out.println((listaDeEspecialidades.size() + 1) + ". Outra (Cadastrar nova especialidade)");
-
         System.out.print("Digite o número da opção: ");
         int escolha = scanner.nextInt();
         scanner.nextLine();
-
         Especialidade especialidadeEscolhida = null;
-
         if (escolha > 0 && escolha <= listaDeEspecialidades.size()) {
             especialidadeEscolhida = listaDeEspecialidades.get(escolha - 1);
         } else if (escolha == listaDeEspecialidades.size() + 1) {
-            System.out.print("Digite o nome da especialidade: ");
+            System.out.print("Digite o nome da nova especialidade: ");
             String nomeNovaEspecialidade = scanner.nextLine();
-
             especialidadeEscolhida = new Especialidade(nomeNovaEspecialidade);
             listaDeEspecialidades.add(especialidadeEscolhida);
             GerenciadorDeArquivos.salvarEspecialidades(listaDeEspecialidades);
-            System.out.println("Nova especialidade '" + nomeNovaEspecialidade + "' foi cadastrada!");
+            System.out.println("Nova especialidade '" + nomeNovaEspecialidade + "' cadastrada!");
         }
-
         if (especialidadeEscolhida != null) {
             Medico novoMedico = new Medico(nome, crm, especialidadeEscolhida, custo);
-
             System.out.print("Deseja adicionar horários para este médico agora? (S/N): ");
             if (scanner.nextLine().equalsIgnoreCase("S")) {
                 System.out.println("Digite os horários disponíveis (ex: 14:00). Digite 'fim' para parar.");
@@ -207,67 +226,106 @@ public class HospitalSistema {
                         novoMedico.adicionarHorario(horario);
                     }
                 }
-
             }
             listaDeMedicos.add(novoMedico);
             GerenciadorDeArquivos.salvarMedicos(listaDeMedicos);
-            System.out.println("Medico cadastrado com sucesso!");
-        }else {
-            System.out.println("Opção de Especialidade inválida. O cadastro foi cancelado");
+            System.out.println("Médico cadastrado com sucesso!");
+        } else {
+            System.out.println("Opção de especialidade inválida. O cadastro foi cancelado.");
         }
-
     }
 
-
-    private static void listarMedicos(){
-        System.out.println("\n--- Lista de Medicos Cadastrados ---");
-        if  (listaDeMedicos.isEmpty()){
-            System.out.println("Nenhum medico cadastrado ainda.");
+    private static void listarMedicos() {
+        System.out.println("\n--- Lista de Médicos Cadastrados ---");
+        if (listaDeMedicos.isEmpty()) {
+            System.out.println("Nenhum médico cadastrado ainda.");
             return;
         }
         for (int i = 0; i < listaDeMedicos.size(); i++) {
-            Medico m =  listaDeMedicos.get(i);
-            System.out.println("\n--- Medico " + (i + 1) + "---");
-            m.exibirInformacoes();
+            System.out.println("\n--- Médico " + (i + 1) + " ---");
+            listaDeMedicos.get(i).exibirInformacoes();
+        }
+    }
+
+    private static void cadastrarPlanoDeSaude() {
+        System.out.println("\n--- Cadastrar Novo Plano de Saúde ---");
+        System.out.print("Nome do Plano: ");
+        String nome = scanner.nextLine();
+        for (PlanoDeSaude p : listaDePlanos) {
+            if (p.getNome().equalsIgnoreCase(nome)) {
+                System.out.println("ERRO: Um plano com este nome já existe.");
+                return;
+            }
+        }
+        System.out.print("Este plano oferece gratuidade para internações de curta duração (< 7 dias)? (S/N): ");
+        boolean cobertura = scanner.nextLine().equalsIgnoreCase("S");
+        PlanoDeSaude novoPlano = new PlanoDeSaude(nome, cobertura);
+        listaDePlanos.add(novoPlano);
+        GerenciadorDeArquivos.salvarPlanos(listaDePlanos);
+        System.out.println("Plano de saúde '" + nome + "' cadastrado com sucesso!");
+    }
+
+    private static void configurarDescontosPlano() {
+        System.out.println("\n--- Configurar Descontos por Especialidade ---");
+        if (listaDePlanos.isEmpty() || listaDeEspecialidades.isEmpty()) {
+            System.out.println("ERRO: É preciso ter ao menos um plano e uma especialidade cadastrados.");
+            return;
+        }
+        System.out.println("Selecione o plano de saúde para configurar:");
+        for (int i = 0; i < listaDePlanos.size(); i++) {
+            System.out.println((i + 1) + ". " + listaDePlanos.get(i).getNome());
+        }
+        System.out.print("Opção de plano: ");
+        int indicePlano = scanner.nextInt() - 1;
+        scanner.nextLine();
+        System.out.println("\nSelecione a especialidade para adicionar/atualizar o desconto:");
+        for (int i = 0; i < listaDeEspecialidades.size(); i++) {
+            System.out.println((i + 1) + ". " + listaDeEspecialidades.get(i).getNome());
+        }
+        System.out.print("Opção de especialidade: ");
+        int indiceEspecialidade = scanner.nextInt() - 1;
+        scanner.nextLine();
+        System.out.print("Digite o percentual de desconto (ex: 0.2 para 20%): ");
+        double percentual = scanner.nextDouble();
+        scanner.nextLine();
+        if (indicePlano >= 0 && indicePlano < listaDePlanos.size() &&
+                indiceEspecialidade >= 0 && indiceEspecialidade < listaDeEspecialidades.size()) {
+            PlanoDeSaude planoEscolhido = listaDePlanos.get(indicePlano);
+            Especialidade especialidadeEscolhida = listaDeEspecialidades.get(indiceEspecialidade);
+            planoEscolhido.adicionarOuAtualizarDesconto(especialidadeEscolhida.getNome(), percentual);
+            GerenciadorDeArquivos.salvarPlanos(listaDePlanos);
+            System.out.println("Desconto de " + (int)(percentual * 100) + "% para " + especialidadeEscolhida.getNome() +
+                    " no plano " + planoEscolhido.getNome() + " foi configurado com sucesso.");
+        } else {
+            System.out.println("Opção de plano ou especialidade inválida.");
         }
     }
 
     private static void agendarNovaConsulta() {
-
-        System.out.println("\n--- Agendamento de Nova Consulta --- ");
-
-        if (listaDePacientes.isEmpty()) {
-            System.out.println("Não há pacientes cadastrados. Cadastre um paciente primeiro");
+        System.out.println("\n--- Agendamento de Nova Consulta ---");
+        if (listaDePacientes.isEmpty() || listaDeMedicos.isEmpty()) {
+            System.out.println("ERRO: É preciso ter ao menos um paciente e um médico cadastrados.");
             return;
         }
-
         System.out.println("Selecione o paciente:");
         for (int i = 0; i < listaDePacientes.size(); i++) {
             System.out.println((i + 1) + ". " + listaDePacientes.get(i).getNome());
         }
-
-        System.out.println("Opção: ");
+        System.out.print("Opção: ");
         int indicePaciente = scanner.nextInt() - 1;
         scanner.nextLine();
-
-        if (listaDeMedicos.isEmpty()) {
-            System.out.println("Não há médicos. Cadastre um médico primeiro");
-            return;
-        }
-        System.out.println("Selecione o medico:");
+        System.out.println("Selecione o médico:");
         for (int i = 0; i < listaDeMedicos.size(); i++) {
             System.out.println((i + 1) + ". Dr(a). " + listaDeMedicos.get(i).getNome());
         }
-
-        System.out.println("Opção: ");
+        System.out.print("Opção: ");
         int indiceMedico = scanner.nextInt() - 1;
         scanner.nextLine();
-
         LocalDateTime dataHoraConsulta = null;
         while (dataHoraConsulta == null) {
             System.out.print("Digite a data da consulta (formato AAAA-MM-DD): ");
             String data = scanner.nextLine();
-            System.out.print("Digite a hora consulta (formato HH:MM): ");
+            System.out.print("Digite a hora da consulta (formato HH:MM): ");
             String hora = scanner.nextLine();
             try {
                 dataHoraConsulta = LocalDateTime.parse(data + "T" + hora);
@@ -275,17 +333,13 @@ public class HospitalSistema {
                 System.out.println("Formato de data/hora inválido. Por favor, tente novamente.");
             }
         }
-
         System.out.print("Digite o local da consulta (ex: Consultório 101): ");
         String local = scanner.nextLine();
-
         try {
             Paciente pacienteEscolhido = listaDePacientes.get(indicePaciente);
             Medico medicoEscolhido = listaDeMedicos.get(indiceMedico);
-
             for (Consulta consultaExistente : listaDeConsultas) {
                 if (consultaExistente.getDataHora().equals(dataHoraConsulta)) {
-
                     if (consultaExistente.getMedico().equals(medicoEscolhido)) {
                         System.out.println("ERRO: O Dr(a). " + medicoEscolhido.getNome() + " já tem uma consulta neste horário.");
                         return;
@@ -296,23 +350,18 @@ public class HospitalSistema {
                     }
                 }
             }
-
             Consulta novaConsulta = new Consulta(pacienteEscolhido, medicoEscolhido, dataHoraConsulta, local);
             listaDeConsultas.add(novaConsulta);
             pacienteEscolhido.adicionarConsulta(novaConsulta);
-
-            System.out.println("\n--- Consulta Agendada com Sucesso! ----");
+            System.out.println("\n--- Consulta Agendada com Sucesso! ---");
             novaConsulta.exibirInformacoes();
-
         } catch (IndexOutOfBoundsException e) {
             System.out.println("Opção de paciente ou médico inválida. Agendamento cancelado.");
         }
-
     }
 
     private static void concluirConsulta() {
         System.out.println("\n--- Concluir Consulta e Registrar Diagnóstico ---");
-
         List<Consulta> consultasAgendadas = new ArrayList<>();
         for (Consulta c : listaDeConsultas) {
             if (c.getStatus() == StatusConsulta.AGENDADA) {
@@ -323,135 +372,74 @@ public class HospitalSistema {
             System.out.println("Não há consultas agendadas para concluir.");
             return;
         }
-
-        System.out.println("Selecione a consulta que deseja concluir: ");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy  HH:mm");
+        System.out.println("Selecione a consulta que deseja concluir:");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         for (int i = 0; i < consultasAgendadas.size(); i++) {
             Consulta c = consultasAgendadas.get(i);
-            System.out.println((i + 1) + ". Pacinte: " + c.getPaciente().getNome() + " | Médico: " + c.getMedico().getNome() + " | Data: " + c.getDataHora().format(formatter));
-
+            System.out.println((i + 1) + ". Paciente: " + c.getPaciente().getNome() +
+                    " | Médico: " + c.getMedico().getNome() +
+                    " | Data: " + c.getDataHora().format(formatter));
         }
-
-        System.out.println("Opção: ");
+        System.out.print("Opção: ");
         int indiceConsulta = scanner.nextInt() - 1;
         scanner.nextLine();
-
         try {
             Consulta consultaEscolhida = consultasAgendadas.get(indiceConsulta);
-
             System.out.print("Digite o diagnóstico: ");
             String diagnostico = scanner.nextLine();
-
             System.out.print("Digite a prescrição de medicamentos: ");
             String prescricao = scanner.nextLine();
-
             consultaEscolhida.registrarDiagnostico(diagnostico, prescricao);
-
             System.out.println("\nConsulta concluída e diagnóstico registrado com sucesso!");
-
         } catch (IndexOutOfBoundsException e) {
             System.out.println("Opção inválida. Operação cancelada.");
-        }
-    }
-    public static void excluirPaciente() {
-        System.out.println("\n--- Excluir Paciente ---");
-
-        if (listaDePacientes.isEmpty()) {
-            System.out.println("Não há pacientes cadastrados para excluir.");
-            return;
-        }
-
-        System.out.println("Selecione o paciente que deseja excluir:");
-        for (int i = 0; i < listaDePacientes.size(); i++) {
-            System.out.println((i + 1) + ". " + listaDePacientes.get(i).getNome() + " (CPF: " + listaDePacientes.get(i).getCpf() + ")");
-        }
-
-        System.out.print("\nDigite o número do paciente (ou 0 para cancelar): ");
-        int escolha = scanner.nextInt();
-        scanner.nextLine();
-
-        if (escolha == 0) {
-            System.out.println("Operação cancelada.");
-            return;
-        }
-
-        if (escolha > 0 && escolha <= listaDePacientes.size()) {
-            int indiceParaExcluir = escolha - 1;
-            String nomeExcluido = listaDePacientes.get(indiceParaExcluir).getNome();
-
-            listaDePacientes.remove(indiceParaExcluir);
-            GerenciadorDeArquivos.salvarPacientes(listaDePacientes);
-
-            System.out.println("Paciente '" + nomeExcluido + "' foi excluído com sucesso!");
-
-        } else {
-            System.out.println("Opção inválida. Operação cancelada.");
-        }
-    }
-
-
-    private static void registrarNovaPaciente() {
-        System.out.println("\n--- Registrar Nova Internação ---");
-
-        if (listaDePacientes.isEmpty() || listaDeMedicos.isEmpty()) {
-            System.out.println("É preciso ter ao menos um paciente e um médico cadastrados.");
-            return;
         }
     }
 
     private static void registrarNovaInternacao() {
         System.out.println("\n--- Registrar Nova Internação ---");
         if (listaDePacientes.isEmpty() || listaDeMedicos.isEmpty()) {
-            System.out.println("ERRO: É ter ao menos um paciente e um médico cadastrados para uma internação.");
+            System.out.println("ERRO: É preciso ter ao menos um paciente e um médico cadastrados.");
             return;
         }
-
-        System.out.println("Selecione o paciente para a interação: ");
+        System.out.println("Selecione o paciente para a internação:");
         for (int i = 0; i < listaDePacientes.size(); i++) {
             System.out.println((i + 1) + ". " + listaDePacientes.get(i).getNome());
         }
-        System.out.print("Opção: ");
+        System.out.print("Opção de paciente: ");
         int indicePaciente = scanner.nextInt() - 1;
         scanner.nextLine();
-
-        System.out.println("Selecione o médico responsável: ");
+        System.out.println("Selecione o médico responsável:");
         for (int i = 0; i < listaDeMedicos.size(); i++) {
             System.out.println((i + 1) + ". Dr(a). " + listaDeMedicos.get(i).getNome());
         }
-
-        System.out.print("Opção: ");
+        System.out.print("Opção de médico: ");
         int indiceMedico = scanner.nextInt() - 1;
         scanner.nextLine();
-
         try {
             Paciente pacienteEscolhido = listaDePacientes.get(indicePaciente);
             Medico medicoEscolhido = listaDeMedicos.get(indiceMedico);
-
-            System.out.print("Digite o nome do quarto: ");
-            String quarto  = scanner.nextLine();
-
+            System.out.print("Digite o número do quarto: ");
+            String quarto = scanner.nextLine();
             for (Internacao i : listaDeInternacoes) {
-                if (i.getQuarto().equalsIgnoreCase(quarto) && i.getStatus() == StatusInternacao.ATIVA){
-                    System.out.println("\nERRO: Este quarto já está ocupado por uma internação ativa. Operação cancelada.");
+                if (i.getQuarto().equalsIgnoreCase(quarto) && i.getStatus() == StatusInternacao.ATIVA) {
+                    System.out.println("\nERRO: Este quarto já está ocupado. Operação cancelada.");
                     return;
                 }
             }
             System.out.print("Digite o custo da diária: R$ ");
             double custoDiaria = scanner.nextDouble();
             scanner.nextLine();
-
             Internacao novaInternacao = new Internacao(pacienteEscolhido, medicoEscolhido, quarto, custoDiaria);
             listaDeInternacoes.add(novaInternacao);
             GerenciadorDeArquivos.salvarInternacoes(listaDeInternacoes);
-
-            System.out.println("Internação registrada com sucesso para o paciente " + pacienteEscolhido.getNome() + " no quarto " + quarto + ".");
-
+            System.out.println("Internação registrada com sucesso para " + pacienteEscolhido.getNome() + ".");
         } catch (IndexOutOfBoundsException e) {
             System.out.println("Opção de paciente ou médico inválida. Operação cancelada.");
         }
     }
 
-    public static void registrarAltaPaciente() {
+    private static void registrarAltaPaciente() {
         System.out.println("\n--- Registrar Alta de Paciente ---");
         List<Internacao> ativas = new ArrayList<>();
         for (Internacao i : listaDeInternacoes) {
@@ -459,26 +447,28 @@ public class HospitalSistema {
                 ativas.add(i);
             }
         }
+
         if (ativas.isEmpty()) {
-            System.out.println("Não há internações ativas para registrar alta.");
+            System.out.println("Não há internações ativas para dar alta.");
             return;
         }
-        System.out.println("Selecione a internação para registrar a alta: ");
+
+        System.out.println("Selecione a internação para registrar a alta:");
         for (int i = 0; i < ativas.size(); i++) {
-            Internacao intern = ativas.get(i);
-            System.out.println((i + 1) + ". Paciente: " + intern.getPaciente().getNome() + ", Quarto: " + intern.getQuarto());
+
+            System.out.println((i + 1) + ". Paciente: " + ativas.get(i).getPaciente().getNome() + ", Quarto: " + ativas.get(i).getQuarto());
         }
         System.out.print("Opção: ");
-        int escolha  = scanner.nextInt() - 1;
+        int escolha = scanner.nextInt() - 1;
         scanner.nextLine();
 
-        if (escolha >= 0 && escolha < ativas.size()){
+        if (escolha >= 0 && escolha < ativas.size()) {
             Internacao internacaoEscolhida = ativas.get(escolha);
             double custoTotal = internacaoEscolhida.registrarAlta();
             GerenciadorDeArquivos.salvarInternacoes(listaDeInternacoes);
-            System.out.println("\nAlta registada com sucesso para o paciente " + internacaoEscolhida.getPaciente().getNome + "!");
+            System.out.println("\nAlta registrada com sucesso para o paciente " + internacaoEscolhida.getPaciente().getNome() + "!");
             System.out.println("Custo total da internação: R$ " + String.format("%.2f", custoTotal));
-        }else {
+        } else {
             System.out.println("Opção inválida.");
         }
     }
@@ -491,26 +481,27 @@ public class HospitalSistema {
                 ativas.add(i);
             }
         }
+
         if (ativas.isEmpty()) {
             System.out.println("Não há internações ativas para cancelar.");
             return;
         }
-        System.out.println("Selecione a internação para cancelar: ");
-        for (int i = 0; i < ativas.size(); i++) {
-            System.out.println((i + 1) + ". Paciente: " + ativas.get(i).getPaciente().getNome() + ", Quarto: " + ativas.get(i).getQuarto());
 
+        System.out.println("Selecione a internação para cancelar:");
+        for (int i = 0; i < ativas.size(); i++) {
+
+            System.out.println((i + 1) + ". Paciente: " + ativas.get(i).getPaciente().getNome() + ", Quarto: " + ativas.get(i).getQuarto());
         }
         System.out.print("Opção: ");
-        int escolha  = scanner.nextInt() - 1;
+        int escolha = scanner.nextInt() - 1;
         scanner.nextLine();
 
-        if (escolha >= 0 && escolha < ativas.size()){
+        if (escolha >= 0 && escolha < ativas.size()) {
             Internacao internacaoEscolhida = ativas.get(escolha);
             internacaoEscolhida.cancelar();
             GerenciadorDeArquivos.salvarInternacoes(listaDeInternacoes);
             System.out.println("Internação do paciente " + internacaoEscolhida.getPaciente().getNome() + " foi cancelada com sucesso!");
-
-        } else{
+        } else {
             System.out.println("Opção inválida.");
         }
     }
@@ -523,8 +514,7 @@ public class HospitalSistema {
         }
         for (Internacao internacao : listaDeInternacoes) {
             internacao.exibirInformacoes();
-            System.out.println("-----------------------");
-
+            System.out.println("--------------------");
         }
     }
 }

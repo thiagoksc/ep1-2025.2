@@ -5,6 +5,7 @@ import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GerenciadorDeArquivos {
 
@@ -12,15 +13,61 @@ public class GerenciadorDeArquivos {
     private static final String ARQUIVO_ESPECIALIDADES = "especialidades.csv";
     private static final String ARQUIVO_MEDICOS = "medicos.csv";
     private static final String ARQUIVO_INTERNACOES = "internacoes.csv";
+    private static final String ARQUIVO_PLANOS = "planos.csv";
 
+    // --- MÉTODOS PARA PLANOS DE SAÚDE ---
+    public static void salvarPlanos(List<PlanoDeSaude> listaDePlanos) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(ARQUIVO_PLANOS))) {
+            for (PlanoDeSaude plano : listaDePlanos) {
+                StringBuilder descontosStr = new StringBuilder();
+                for (Map.Entry<String, Double> entry : plano.getDescontos().entrySet()) {
+                    descontosStr.append(entry.getKey()).append(":").append(entry.getValue()).append("|");
+                }
+                String linha = plano.getNome() + ";" + plano.isCobreInternacaoCurta() + ";" + descontosStr.toString();
+                writer.println(linha);
+            }
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar planos de saúde: " + e.getMessage());
+        }
+    }
 
+    public static List<PlanoDeSaude> carregarPlanos() {
+        List<PlanoDeSaude> listaDePlanos = new ArrayList<>();
+        File arquivo = new File(ARQUIVO_PLANOS);
+        if (!arquivo.exists()) return listaDePlanos;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(arquivo))) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                String[] dados = linha.split(";", -1);
+                String nome = dados[0];
+                boolean cobreInternacao = Boolean.parseBoolean(dados[1]);
+                PlanoDeSaude plano = new PlanoDeSaude(nome, cobreInternacao);
+                if (dados.length > 2 && !dados[2].isEmpty()) {
+                    String[] descontos = dados[2].split("\\|");
+                    for (String desconto : descontos) {
+                        if (desconto.contains(":")) {
+                            String[] par = desconto.split(":");
+                            plano.adicionarOuAtualizarDesconto(par[0], Double.parseDouble(par[1]));
+                        }
+                    }
+                }
+                listaDePlanos.add(plano);
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao carregar planos de saúde: " + e.getMessage());
+        }
+        return listaDePlanos;
+    }
+
+    // --- MÉTODOS DE PACIENTES ---
     public static void salvarPacientes(List<Paciente> listaDePacientes) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(ARQUIVO_PACIENTES))) {
             for (Paciente paciente : listaDePacientes) {
                 String linha = paciente.getCpf() + ";" + paciente.getNome() + ";" + paciente.getIdade();
                 if (paciente instanceof PacienteEspecial) {
                     PacienteEspecial pe = (PacienteEspecial) paciente;
-                    linha += ";S;" + pe.getPlanoDeSaude();
+                    linha += ";S;" + pe.getPlanoDeSaude().getNome();
                 } else {
                     linha += ";N;N/A";
                 }
@@ -31,10 +78,12 @@ public class GerenciadorDeArquivos {
         }
     }
 
-    public static List<Paciente> carregarPacientes() {
+    // AQUI ESTÁ A ASSINATURA CORRETA DO MÉTODO
+    public static List<Paciente> carregarPacientes(List<PlanoDeSaude> planos) {
         List<Paciente> listaDePacientes = new ArrayList<>();
         File arquivo = new File(ARQUIVO_PACIENTES);
-        if (!arquivo.exists()) { return listaDePacientes; }
+        if (!arquivo.exists()) return listaDePacientes;
+
         try (BufferedReader reader = new BufferedReader(new FileReader(arquivo))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
@@ -44,20 +93,25 @@ public class GerenciadorDeArquivos {
                 String nome = dados[1];
                 int idade = Integer.parseInt(dados[2]);
                 boolean temPlano = dados[3].equalsIgnoreCase("S");
+
                 if (temPlano && dados.length > 4) {
-                    String planoDeSaude = dados[4];
-                    listaDePacientes.add(new PacienteEspecial(nome, cpf, idade, planoDeSaude));
+                    String nomePlano = dados[4];
+                    PlanoDeSaude plano = encontrarPlanoPorNome(nomePlano, planos);
+                    if (plano != null) {
+                        listaDePacientes.add(new PacienteEspecial(nome, cpf, idade, plano));
+                    }
                 } else {
                     listaDePacientes.add(new Paciente(nome, cpf, idade));
                 }
             }
-        } catch (IOException | NumberFormatException e) {
+        } catch (Exception e) {
             System.out.println("Erro ao carregar pacientes: " + e.getMessage());
         }
         return listaDePacientes;
     }
 
-
+    // (O resto dos métodos, como salvarMedicos, etc., já estão aqui)
+    // --- MÉTODOS DE ESPECIALIDADES ---
     public static void salvarEspecialidades(List<Especialidade> listaDeEspecialidades) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(ARQUIVO_ESPECIALIDADES))) {
             for (Especialidade especialidade : listaDeEspecialidades) {
@@ -85,7 +139,7 @@ public class GerenciadorDeArquivos {
         return listaDeEspecialidades;
     }
 
-
+    // --- MÉTODOS DE MÉDICOS ---
     public static void salvarMedicos(List<Medico> listaDeMedicos) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(ARQUIVO_MEDICOS))) {
             for (Medico medico : listaDeMedicos) {
@@ -134,7 +188,7 @@ public class GerenciadorDeArquivos {
         return listaDeMedicos;
     }
 
-
+    // --- MÉTODOS DE INTERNAÇÕES ---
     public static void salvarInternacoes(List<Internacao> listaDeInternacoes) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(ARQUIVO_INTERNACOES))) {
             for (Internacao internacao : listaDeInternacoes) {
@@ -184,7 +238,7 @@ public class GerenciadorDeArquivos {
         return listaDeInternacoes;
     }
 
-
+    // --- MÉTODOS AUXILIARES ---
     private static Especialidade encontrarEspecialidadePorNome(String nome, List<Especialidade> especialidades) {
         for (Especialidade e : especialidades) {
             if (e.getNome().equalsIgnoreCase(nome)) {
@@ -207,6 +261,15 @@ public class GerenciadorDeArquivos {
         for (Medico m : medicos) {
             if (m.getCrm().equals(crm)) {
                 return m;
+            }
+        }
+        return null;
+    }
+
+    private static PlanoDeSaude encontrarPlanoPorNome(String nome, List<PlanoDeSaude> planos) {
+        for (PlanoDeSaude p : planos) {
+            if (p.getNome().equalsIgnoreCase(nome)) {
+                return p;
             }
         }
         return null;

@@ -39,6 +39,15 @@ public class Internacao {
             this.status = StatusInternacao.FINALIZADA;
             long diasInternado = ChronoUnit.DAYS.between(dataEntrada, dataSaida);
             diasInternado = diasInternado == 0 ? 1 : diasInternado;
+
+            if (this.paciente instanceof PacienteEspecial) {
+                PacienteEspecial pe = (PacienteEspecial) this.paciente;
+                if (pe.getPlanoDeSaude().isCobreInternacaoCurta() && diasInternado < 7) {
+                    System.out.println("INFO: Internação de curta duração coberta pelo plano. Custo: R$ 0,00.");
+                    return 0.0;
+                }
+            }
+
             return diasInternado * this.custoDiaria;
         }
         return 0;
