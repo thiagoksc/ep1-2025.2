@@ -33,6 +33,13 @@ public class Paciente {
         System.out.println("Idade: " + idade);
     }
 
+    public List<Consulta> getHistoricoConsultas(){
+        return historicoConsultas;
+    }
+    public List<Internacao> getHistoricoInternacoes(){
+        return historicoInternacoes;
+    }
+
     public void adicionarConsulta(Consulta consulta){
         this.historicoConsultas.add(consulta);
     }

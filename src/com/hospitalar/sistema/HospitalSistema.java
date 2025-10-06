@@ -1,8 +1,10 @@
 package com.hospitalar.sistema;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -40,7 +42,7 @@ public class HospitalSistema {
 
         int opcao = 0;
         while (opcao != 15) {
-            exibirMenu();
+            exibirMenuPrincipal();
             System.out.print("Escolha uma opção: ");
 
             try {
@@ -66,6 +68,7 @@ public class HospitalSistema {
                 case 11: registrarAltaPaciente(); break;
                 case 12: cancelarInternacao(); break;
                 case 13: listarInternacoes(); break;
+                case 14: exibirMenuRelatorios(); break;
                 case 15: System.out.println("Encerrando o sistema..."); break;
                 default:
                     if (opcao != 15) {
@@ -76,7 +79,9 @@ public class HospitalSistema {
         scanner.close();
     }
 
-    private static void exibirMenu() {
+
+
+    private static void exibirMenuPrincipal() {
         System.out.println("\n--- MENU PRINCIPAL ---");
         System.out.println("--- Pacientes ---");
         System.out.println("1. Cadastrar Novo Paciente");
@@ -94,8 +99,98 @@ public class HospitalSistema {
         System.out.println("11. Registrar Alta de Paciente");
         System.out.println("12. Cancelar Internação");
         System.out.println("13. Listar Internações");
-        System.out.println("--------------------");
+        System.out.println("--- Sistema ---");
+        System.out.println("14. Módulo de Relatórios");
         System.out.println("15. Sair");
+    }
+
+
+
+    private static void exibirMenuRelatorios() {
+        int opcao = 0;
+        while (opcao != 9) {
+            System.out.println("\n--- MÓDULO DE RELATÓRIOS ---");
+            System.out.println("1. Relatório de Pacientes (com Histórico)");
+            System.out.println("2. Relatório de Pacientes Internados");
+            System.out.println("9. Voltar ao Menu Principal");
+            System.out.print("Escolha uma opção de relatório: ");
+
+            try {
+                opcao = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("\nERRO: Opção inválida.");
+                opcao = 0;
+            } finally {
+                scanner.nextLine();
+            }
+
+            switch (opcao) {
+                case 1: gerarRelatorioPacientesComHistorico(); break;
+                case 2: gerarRelatorioInternacoesAtivas(); break;
+                case 9: System.out.println("Retornando ao menu principal..."); break;
+                default: System.out.println("Opção inválida.");
+            }
+        }
+    }
+    private static void gerarRelatorioPacientesComHistorico() {
+        System.out.println("\n--- Relatório Detalhado de Pacientes ---");
+        if (listaDePacientes.isEmpty()) {
+            System.out.println("Nenhum paciente cadastrado.");
+            return;
+        }
+
+        for (Paciente paciente : listaDePacientes) {
+            paciente.exibirInformacoes();
+
+
+            if (paciente.getHistoricoConsultas().isEmpty()) {
+                System.out.println("  -> Sem histórico de consultas.");
+            } else {
+                System.out.println("  --- Histórico de Consultas ---");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                for (Consulta consulta : paciente.getHistoricoConsultas()) {
+                    System.out.println("    - Data: " + consulta.getDataHora().format(formatter) +
+                            " | Dr(a). " + consulta.getMedico().getNome() +
+                            " | Status: " + consulta.getStatus());
+                }
+            }
+
+
+            if (paciente.getHistoricoInternacoes().isEmpty()) {
+                System.out.println("  -> Sem histórico de internações.");
+            } else {
+                System.out.println("  --- Histórico de Internações ---");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                for (Internacao internacao : paciente.getHistoricoInternacoes()) {
+                    System.out.println("    - Entrada: " + internacao.getDataEntrada().format(formatter) +
+                            " | Quarto: " + internacao.getQuarto() +
+                            " | Status: " + internacao.getStatus());
+                }
+            }
+            System.out.println("==========================================");
+        }
+    }
+    private static void gerarRelatorioInternacoesAtivas() {
+        System.out.println("\n--- Relatório de Pacientes Internados Atualmente ---");
+        boolean encontrouAtiva = false;
+
+        for (Internacao internacao : listaDeInternacoes) {
+            if (internacao.getStatus() == StatusInternacao.ATIVA) {
+                if (!encontrouAtiva) {
+                    encontrouAtiva = true;
+                }
+                internacao.exibirInformacoes();
+
+                // Calcula e exibe o tempo de internação
+                long diasInternado = ChronoUnit.DAYS.between(internacao.getDataEntrada(), LocalDate.now());
+                System.out.println("Tempo de Internação (até agora): " + diasInternado + " dias.");
+                System.out.println("--------------------");
+            }
+        }
+
+        if (!encontrouAtiva) {
+            System.out.println("Nenhum paciente internado no momento.");
+        }
     }
 
     private static void cadastrarNovoPaciente() {
