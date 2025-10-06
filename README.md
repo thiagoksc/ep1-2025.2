@@ -49,7 +49,8 @@ Desenvolvimento de um sistema de gerenciamento hospitalar utilizando os conceito
    ![Inserir Print 2](caminho/do/print2.png)
 
 3. Relatório de ?:  
-   ![Inserir Print 3](caminho/do/print3.png)
+   <img width="1763" height="748" alt="Captura de tela 2025-10-06 105424" src="https://github.com/user-attachments/assets/b0a4b481-ffcc-40fa-94a5-59f61f3ace8a" />
+
 
 ---
 
