@@ -50,7 +50,8 @@ Desenvolvimento de um sistema de gerenciamento hospitalar utilizando os conceito
 
 
 3. Relatório de ?:  
-   <img width="1763" height="748" alt="Captura de tela 2025-10-06 105424" src="https://github.com/user-attachments/assets/b0a4b481-ffcc-40fa-94a5-59f61f3ace8a" />
+   <img width="1754" height="783" alt="Captura de tela 2025-10-06 110205" src="https://github.com/user-attachments/assets/f65c16c4-de49-4fb3-9d10-575d9902a143" />
+
 
 
 ---
